@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Build artifacts
+build/
+cmake-build-*/
+*.o
+
+# IDE
+.idea/
+.vscode/

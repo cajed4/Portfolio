@@ -1,0 +1,6 @@
+pandas>=2.2
+pyarrow>=15.0
+databento>=0.35
+duckdb>=1.0
+python-dotenv>=1.0
+pytest>=8.0
