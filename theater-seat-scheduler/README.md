@@ -1,6 +1,6 @@
 # Theater Seat Scheduler
 
-A C++ seating-management system built for a data structures course: checks customers into a
+A C++ seating-management system built for an entry to programming course: checks customers into a
 theater with two seat classes (regular and priority "Avenger" seating), assigns/releases seats,
 and reports live occupancy.
 
