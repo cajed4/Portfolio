@@ -8,7 +8,7 @@ data-structures coursework.
 ## About
 
 - Junior, Computer Science, University of Detroit Mercy
-- AI Data Annotation Contractor at Handshake AI — evaluating and labeling model outputs
+- AI Data Annotation Contractor for Handshake AI, evaluating and labeling model outputs
   (rubric-based grading, video/text annotation) for training data quality
 - Founder, AJ's Vending — running a small vending machine business since 2022
 - 8+ years of hands-on PC hardware experience
