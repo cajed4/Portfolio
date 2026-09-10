@@ -1,0 +1,596 @@
+//@version=6
+indicator("Key Level Sweep & Rejection", shorttitle="KLSR", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
+
+// ═══════════════════════════════════════════════════════════════════
+//  KEY LEVEL SWEEP & REJECTION
+//  Tracks 39 key levels (4H/D/W/M/Q/Y opens+prev H/L/mid, Monday
+//  Range, London/NY/Asia ranges, fixed-time opens). Shows two
+//  independent, same-bar events per level:
+//    SWEEP     — price trades through the level (fresh cross only)
+//    REJECTION — wick touches/passes the level, close snaps back
+//  No bias, no VWAP, no order logic — pure level-reaction detection.
+// ═══════════════════════════════════════════════════════════════════
+
+// ───────────────────────── GENERAL ─────────────────────────
+grpGen = "General"
+tz          = input.string("America/New_York", "Timezone (sessions & fixed times)", group=grpGen)
+lineWidth   = input.int(1, "Line Width", minval=1, maxval=4, group=grpGen)
+labelSizeStr= input.string("Small", "Signal Label Size", options=["Tiny","Small","Normal"], group=grpGen)
+showOpens   = input.bool(true, "Show Open Lines/Labels (visual only)", group=grpGen)
+showMids    = input.bool(true, "Show Mid Lines/Labels (visual only)", group=grpGen)
+showHiLo    = input.bool(true, "Show High/Low Lines/Labels (visual only)", group=grpGen)
+showLevelLabels = input.bool(false, "Show Level Name Labels (chart clutter)", group=grpGen)
+showLevelLines  = input.bool(false, "Show Level Lines (backend-only if off)", group=grpGen)
+showDashboard   = input.bool(true, "Show Dashboard", group=grpGen)
+dashRows        = input.int(5, "Dashboard Rows", minval=1, maxval=15, group=grpGen)
+dashPosStr      = input.string("Top Right", "Dashboard Position", options=["Top Right","Top Left","Bottom Right","Bottom Left"], group=grpGen)
+
+// ───────────────────────── CATEGORY TOGGLES + COLORS ─────────────────────────
+grp4H  = "4H Levels"
+show4H = input.bool(true, "Enable", group=grp4H)
+col4H  = input.color(#787B86, "Color", group=grp4H)
+
+grpD   = "Daily Levels"
+showD  = input.bool(true, "Enable", group=grpD)
+colD   = input.color(#2962FF, "Color", group=grpD)
+
+grpMon = "Monday Range"
+showMon= input.bool(true, "Enable", group=grpMon)
+colMon = input.color(#FF6D00, "Color", group=grpMon)
+
+grpW   = "Weekly Levels"
+showW  = input.bool(true, "Enable", group=grpW)
+colW   = input.color(#9C27B0, "Color", group=grpW)
+
+grpMth = "Monthly Levels"
+showMth= input.bool(true, "Enable", group=grpMth)
+colMth = input.color(#00BCD4, "Color", group=grpMth)
+
+grpQtr = "Quarterly Levels"
+showQtr= input.bool(true, "Enable", group=grpQtr)
+colQtr = input.color(#E91E63, "Color", group=grpQtr)
+
+grpYr  = "Yearly Levels"
+showYr = input.bool(true, "Enable", group=grpYr)
+colYr  = input.color(#FFD600, "Color", group=grpYr)
+
+grpLDN = "London Session"
+showLDN= input.bool(true, "Enable", group=grpLDN)
+colLDN = input.color(#4CAF50, "Color", group=grpLDN)
+sessLDN= input.session("0300-0800", "Session (start-end)", group=grpLDN)
+
+grpNY  = "New York Session"
+showNY = input.bool(true, "Enable", group=grpNY)
+colNY  = input.color(#F44336, "Color", group=grpNY)
+sessNY = input.session("0800-1700", "Session (start-end)", group=grpNY)
+
+grpASIA= "Asia Session"
+showASIA=input.bool(true, "Enable", group=grpASIA)
+colASIA= input.color(#FF9800, "Color", group=grpASIA)
+sessASIA=input.session("1900-0400", "Session (start-end)", group=grpASIA)
+
+grpFix = "Fixed Time Opens"
+show0600 = input.bool(true, "Enable Time 1 Open", group=grpFix)
+t1Hour   = input.int(6, "Time 1 - Hour (0-23)", minval=0, maxval=23, group=grpFix)
+t1Min    = input.int(0, "Time 1 - Minute", minval=0, maxval=59, group=grpFix)
+show1000 = input.bool(true, "Enable Time 2 Open", group=grpFix)
+t2Hour   = input.int(10, "Time 2 - Hour (0-23)", minval=0, maxval=23, group=grpFix)
+t2Min    = input.int(0, "Time 2 - Minute", minval=0, maxval=59, group=grpFix)
+show1400 = input.bool(true, "Enable Time 3 Open", group=grpFix)
+t3Hour   = input.int(14, "Time 3 - Hour (0-23)", minval=0, maxval=23, group=grpFix)
+t3Min    = input.int(0, "Time 3 - Minute", minval=0, maxval=59, group=grpFix)
+colFix   = input.color(#B0BEC5, "Color", group=grpFix)
+
+// ───────────────────────── SWEEP & REJECTION ─────────────────────────
+grpSwp = "Sweep & Rejection"
+minSweepTicks        = input.float(0.0, "Min Sweep Distance (price units, 0=off)", minval=0.0, group=grpSwp)
+includeOpenMidSweep  = input.bool(true, "Include Open/Mid Levels as Sweep/Reject Targets", group=grpSwp)
+showSweepMarkers      = input.bool(true, "Show Sweep Markers", group=grpSwp)
+showRejectMarkers     = input.bool(true, "Show Rejection Markers", group=grpSwp)
+enableAlerts          = input.bool(false, "Enable Alerts", group=grpSwp)
+alertOnSweep          = input.bool(true, "Alert on Sweep", group=grpSwp)
+alertOnReject         = input.bool(true, "Alert on Rejection", group=grpSwp)
+maxSignalHistory     = input.int(200, "Max Signal Markers Kept", minval=20, maxval=400, group=grpSwp)
+
+// ═══════════════════════════════════════════════════════════════════
+//  TYPE + HELPERS
+// ═══════════════════════════════════════════════════════════════════
+type KLevel
+    string sub          // "O","H","L","M"
+    string dispName
+    float  val
+    float  prevVal
+    color  col
+    bool   enabled
+    bool   sweepTarget
+    line   ln
+    label  lb
+    bool   sweptUpState
+    bool   sweptDnState
+    bool   rejUpActive
+    bool   rejDnActive
+
+f_mk(sub, dispName, col, catShow) =>
+    bool en = catShow
+    bool sw = (sub == "H" or sub == "L") or includeOpenMidSweep
+    KLevel.new(sub, dispName, na, na, col, en, sw, na, na, false, false, false, false)
+
+f_lineStyle(sub) =>
+    sub == "O" ? line.style_dashed : sub == "M" ? line.style_dotted : line.style_solid
+
+lblSz = labelSizeStr == "Tiny" ? size.tiny : labelSizeStr == "Normal" ? size.normal : size.small
+
+f_fmtTime(h, m) =>
+    hStr = h < 10 ? "0" + str.tostring(h) : str.tostring(h)
+    mStr = m < 10 ? "0" + str.tostring(m) : str.tostring(m)
+    hStr + ":" + mStr + " Open"
+
+// ═══════════════════════════════════════════════════════════════════
+//  ARRAY OF ALL 39 LEVEL SLOTS (fixed index order)
+// ═══════════════════════════════════════════════════════════════════
+I_H4_O = 0
+I_H4_PH = 1
+I_H4_PL = 2
+I_H4_PM = 3
+I_D_O = 4
+I_D_PH = 5
+I_D_PL = 6
+I_D_PM = 7
+I_MON_H = 8
+I_MON_L = 9
+I_MON_M = 10
+I_W_O = 11
+I_W_PH = 12
+I_W_PL = 13
+I_W_PM = 14
+I_MT_O = 15
+I_MT_PH = 16
+I_MT_PL = 17
+I_MT_PM = 18
+I_QT_O = 19
+I_QT_PH = 20
+I_QT_PL = 21
+I_QT_PM = 22
+I_YR_O = 23
+I_YR_PH = 24
+I_YR_PL = 25
+I_YR_PM = 26
+I_LDN_O = 27
+I_LDN_H = 28
+I_LDN_L = 29
+I_NY_O = 30
+I_NY_H = 31
+I_NY_L = 32
+I_AS_O = 33
+I_AS_H = 34
+I_AS_L = 35
+I_T6 = 36
+I_T10 = 37
+I_T14 = 38
+
+var array<KLevel> gLevels = array.new<KLevel>()
+
+if barstate.isfirst
+    array.push(gLevels, f_mk("O","4H Open",        col4H,  show4H))
+    array.push(gLevels, f_mk("H","4H Prev High",    col4H,  show4H))
+    array.push(gLevels, f_mk("L","4H Prev Low",     col4H,  show4H))
+    array.push(gLevels, f_mk("M","4H Prev Mid",     col4H,  show4H))
+
+    array.push(gLevels, f_mk("O","Daily Open",      colD,   showD))
+    array.push(gLevels, f_mk("H","Daily Prev High", colD,   showD))
+    array.push(gLevels, f_mk("L","Daily Prev Low",  colD,   showD))
+    array.push(gLevels, f_mk("M","Daily Prev Mid",  colD,   showD))
+
+    array.push(gLevels, f_mk("H","Monday High",     colMon, showMon))
+    array.push(gLevels, f_mk("L","Monday Low",      colMon, showMon))
+    array.push(gLevels, f_mk("M","Monday Mid",      colMon, showMon))
+
+    array.push(gLevels, f_mk("O","Weekly Open",     colW,   showW))
+    array.push(gLevels, f_mk("H","Weekly Prev High",colW,   showW))
+    array.push(gLevels, f_mk("L","Weekly Prev Low", colW,   showW))
+    array.push(gLevels, f_mk("M","Weekly Prev Mid", colW,   showW))
+
+    array.push(gLevels, f_mk("O","Monthly Open",      colMth, showMth))
+    array.push(gLevels, f_mk("H","Monthly Prev High", colMth, showMth))
+    array.push(gLevels, f_mk("L","Monthly Prev Low",  colMth, showMth))
+    array.push(gLevels, f_mk("M","Monthly Prev Mid",  colMth, showMth))
+
+    array.push(gLevels, f_mk("O","Quarterly Open",      colQtr, showQtr))
+    array.push(gLevels, f_mk("H","Quarterly Prev High", colQtr, showQtr))
+    array.push(gLevels, f_mk("L","Quarterly Prev Low",  colQtr, showQtr))
+    array.push(gLevels, f_mk("M","Quarterly Prev Mid",  colQtr, showQtr))
+
+    array.push(gLevels, f_mk("O","Yearly Open",      colYr,  showYr))
+    array.push(gLevels, f_mk("H","Yearly Prev High", colYr,  showYr))
+    array.push(gLevels, f_mk("L","Yearly Prev Low",  colYr,  showYr))
+    array.push(gLevels, f_mk("M","Yearly Prev Mid",  colYr,  showYr))
+
+    array.push(gLevels, f_mk("O","London Open", colLDN, showLDN))
+    array.push(gLevels, f_mk("H","London High", colLDN, showLDN))
+    array.push(gLevels, f_mk("L","London Low",  colLDN, showLDN))
+
+    array.push(gLevels, f_mk("O","NY Open", colNY, showNY))
+    array.push(gLevels, f_mk("H","NY High", colNY, showNY))
+    array.push(gLevels, f_mk("L","NY Low",  colNY, showNY))
+
+    array.push(gLevels, f_mk("O","Asia Open", colASIA, showASIA))
+    array.push(gLevels, f_mk("H","Asia High", colASIA, showASIA))
+    array.push(gLevels, f_mk("L","Asia Low",  colASIA, showASIA))
+
+    array.push(gLevels, f_mk("O",f_fmtTime(t1Hour, t1Min), colFix, show0600))
+    array.push(gLevels, f_mk("O",f_fmtTime(t2Hour, t2Min), colFix, show1000))
+    array.push(gLevels, f_mk("O",f_fmtTime(t3Hour, t3Min), colFix, show1400))
+
+// ═══════════════════════════════════════════════════════════════════
+//  PER-CATEGORY LEVEL TRACKING
+// ═══════════════════════════════════════════════════════════════════
+
+// ---- 4H ----
+newP_h4 = timeframe.change("240")
+var float h4Open = na
+var float h4CurH = na
+var float h4CurL = na
+var float h4PrevH = na
+var float h4PrevL = na
+if newP_h4
+    h4PrevH := h4CurH
+    h4PrevL := h4CurL
+    h4Open := open
+    h4CurH := high
+    h4CurL := low
+else
+    h4CurH := math.max(nz(h4CurH, high), high)
+    h4CurL := math.min(nz(h4CurL, low), low)
+h4PrevM = (h4PrevH + h4PrevL) / 2
+refLvl = array.get(gLevels, I_H4_O)
+refLvl.val := h4Open
+refLvl := array.get(gLevels, I_H4_PH)
+refLvl.val := h4PrevH
+refLvl := array.get(gLevels, I_H4_PL)
+refLvl.val := h4PrevL
+refLvl := array.get(gLevels, I_H4_PM)
+refLvl.val := h4PrevM
+
+// ---- Daily ----
+newP_d = timeframe.change("D")
+var float dOpen = na
+var float dCurH = na
+var float dCurL = na
+var float dPrevH = na
+var float dPrevL = na
+if newP_d
+    dPrevH := dCurH
+    dPrevL := dCurL
+    dOpen := open
+    dCurH := high
+    dCurL := low
+else
+    dCurH := math.max(nz(dCurH, high), high)
+    dCurL := math.min(nz(dCurL, low), low)
+dPrevM = (dPrevH + dPrevL) / 2
+refLvl := array.get(gLevels, I_D_O)
+refLvl.val := dOpen
+refLvl := array.get(gLevels, I_D_PH)
+refLvl.val := dPrevH
+refLvl := array.get(gLevels, I_D_PL)
+refLvl.val := dPrevL
+refLvl := array.get(gLevels, I_D_PM)
+refLvl.val := dPrevM
+
+// ---- Monday Range ----
+newWk_mon = timeframe.change("W")
+var float monH = na
+var float monL = na
+if newWk_mon
+    monH := na
+    monL := na
+isMonday = dayofweek(time, tz) == dayofweek.monday
+if isMonday
+    monH := na(monH) ? high : math.max(monH, high)
+    monL := na(monL) ? low : math.min(monL, low)
+monM = (monH + monL) / 2
+refLvl := array.get(gLevels, I_MON_H)
+refLvl.val := monH
+refLvl := array.get(gLevels, I_MON_L)
+refLvl.val := monL
+refLvl := array.get(gLevels, I_MON_M)
+refLvl.val := monM
+
+// ---- Weekly ----
+newP_w = timeframe.change("W")
+var float wOpen = na
+var float wCurH = na
+var float wCurL = na
+var float wPrevH = na
+var float wPrevL = na
+if newP_w
+    wPrevH := wCurH
+    wPrevL := wCurL
+    wOpen := open
+    wCurH := high
+    wCurL := low
+else
+    wCurH := math.max(nz(wCurH, high), high)
+    wCurL := math.min(nz(wCurL, low), low)
+wPrevM = (wPrevH + wPrevL) / 2
+refLvl := array.get(gLevels, I_W_O)
+refLvl.val := wOpen
+refLvl := array.get(gLevels, I_W_PH)
+refLvl.val := wPrevH
+refLvl := array.get(gLevels, I_W_PL)
+refLvl.val := wPrevL
+refLvl := array.get(gLevels, I_W_PM)
+refLvl.val := wPrevM
+
+// ---- Monthly ----
+newP_mt = timeframe.change("M")
+var float mtOpen = na
+var float mtCurH = na
+var float mtCurL = na
+var float mtPrevH = na
+var float mtPrevL = na
+if newP_mt
+    mtPrevH := mtCurH
+    mtPrevL := mtCurL
+    mtOpen := open
+    mtCurH := high
+    mtCurL := low
+else
+    mtCurH := math.max(nz(mtCurH, high), high)
+    mtCurL := math.min(nz(mtCurL, low), low)
+mtPrevM = (mtPrevH + mtPrevL) / 2
+refLvl := array.get(gLevels, I_MT_O)
+refLvl.val := mtOpen
+refLvl := array.get(gLevels, I_MT_PH)
+refLvl.val := mtPrevH
+refLvl := array.get(gLevels, I_MT_PL)
+refLvl.val := mtPrevL
+refLvl := array.get(gLevels, I_MT_PM)
+refLvl.val := mtPrevM
+
+// ---- Quarterly ----
+newP_qt = timeframe.change("3M")
+var float qtOpen = na
+var float qtCurH = na
+var float qtCurL = na
+var float qtPrevH = na
+var float qtPrevL = na
+if newP_qt
+    qtPrevH := qtCurH
+    qtPrevL := qtCurL
+    qtOpen := open
+    qtCurH := high
+    qtCurL := low
+else
+    qtCurH := math.max(nz(qtCurH, high), high)
+    qtCurL := math.min(nz(qtCurL, low), low)
+qtPrevM = (qtPrevH + qtPrevL) / 2
+refLvl := array.get(gLevels, I_QT_O)
+refLvl.val := qtOpen
+refLvl := array.get(gLevels, I_QT_PH)
+refLvl.val := qtPrevH
+refLvl := array.get(gLevels, I_QT_PL)
+refLvl.val := qtPrevL
+refLvl := array.get(gLevels, I_QT_PM)
+refLvl.val := qtPrevM
+
+// ---- Yearly ----
+newP_yr = timeframe.change("12M")
+var float yrOpen = na
+var float yrCurH = na
+var float yrCurL = na
+var float yrPrevH = na
+var float yrPrevL = na
+if newP_yr
+    yrPrevH := yrCurH
+    yrPrevL := yrCurL
+    yrOpen := open
+    yrCurH := high
+    yrCurL := low
+else
+    yrCurH := math.max(nz(yrCurH, high), high)
+    yrCurL := math.min(nz(yrCurL, low), low)
+yrPrevM = (yrPrevH + yrPrevL) / 2
+refLvl := array.get(gLevels, I_YR_O)
+refLvl.val := yrOpen
+refLvl := array.get(gLevels, I_YR_PH)
+refLvl.val := yrPrevH
+refLvl := array.get(gLevels, I_YR_PL)
+refLvl.val := yrPrevL
+refLvl := array.get(gLevels, I_YR_PM)
+refLvl.val := yrPrevM
+
+// ---- London session ----
+tLDN = time(timeframe.period, sessLDN, tz)
+inLDN = not na(tLDN)
+ldnStart = inLDN and not inLDN[1]
+var float ldnOpen = na
+var float ldnH = na
+var float ldnL = na
+if ldnStart
+    ldnOpen := open
+    ldnH := high
+    ldnL := low
+else if inLDN
+    ldnH := math.max(nz(ldnH, high), high)
+    ldnL := math.min(nz(ldnL, low), low)
+refLvl := array.get(gLevels, I_LDN_O)
+refLvl.val := ldnOpen
+refLvl := array.get(gLevels, I_LDN_H)
+refLvl.val := ldnH
+refLvl := array.get(gLevels, I_LDN_L)
+refLvl.val := ldnL
+
+// ---- NY session ----
+tNY = time(timeframe.period, sessNY, tz)
+inNY = not na(tNY)
+nyStart = inNY and not inNY[1]
+var float nyOpen = na
+var float nyH = na
+var float nyL = na
+if nyStart
+    nyOpen := open
+    nyH := high
+    nyL := low
+else if inNY
+    nyH := math.max(nz(nyH, high), high)
+    nyL := math.min(nz(nyL, low), low)
+refLvl := array.get(gLevels, I_NY_O)
+refLvl.val := nyOpen
+refLvl := array.get(gLevels, I_NY_H)
+refLvl.val := nyH
+refLvl := array.get(gLevels, I_NY_L)
+refLvl.val := nyL
+
+// ---- Asia session ----
+tAS = time(timeframe.period, sessASIA, tz)
+inAS = not na(tAS)
+asStart = inAS and not inAS[1]
+var float asOpen = na
+var float asH = na
+var float asL = na
+if asStart
+    asOpen := open
+    asH := high
+    asL := low
+else if inAS
+    asH := math.max(nz(asH, high), high)
+    asL := math.min(nz(asL, low), low)
+refLvl := array.get(gLevels, I_AS_O)
+refLvl.val := asOpen
+refLvl := array.get(gLevels, I_AS_H)
+refLvl.val := asH
+refLvl := array.get(gLevels, I_AS_L)
+refLvl.val := asL
+
+// ---- Fixed time opens ----
+hNow = hour(time, tz)
+mNow = minute(time, tz)
+curMinOfDay = hNow * 60 + mNow
+todayId = year(time, tz) * 10000 + month(time, tz) * 100 + dayofmonth(time, tz)
+tgt1 = t1Hour * 60 + t1Min
+tgt2 = t2Hour * 60 + t2Min
+tgt3 = t3Hour * 60 + t3Min
+var int lastDay1 = na
+var int lastDay2 = na
+var int lastDay3 = na
+var float o0600 = na
+var float o1000 = na
+var float o1400 = na
+if curMinOfDay >= tgt1 and (na(lastDay1) or lastDay1 != todayId)
+    o0600 := open
+    lastDay1 := todayId
+if curMinOfDay >= tgt2 and (na(lastDay2) or lastDay2 != todayId)
+    o1000 := open
+    lastDay2 := todayId
+if curMinOfDay >= tgt3 and (na(lastDay3) or lastDay3 != todayId)
+    o1400 := open
+    lastDay3 := todayId
+refLvl := array.get(gLevels, I_T6)
+refLvl.val := o0600
+refLvl := array.get(gLevels, I_T10)
+refLvl.val := o1000
+refLvl := array.get(gLevels, I_T14)
+refLvl.val := o1400
+
+// ═══════════════════════════════════════════════════════════════════
+//  DRAW LEVELS + SWEEP / REJECTION DETECTION
+// ═══════════════════════════════════════════════════════════════════
+var array<box> sigBoxes = array.new<box>()
+var array<string> dashEvents = array.new<string>()
+var array<color> dashColors = array.new<color>()
+
+var bool anySweepFired = false
+var bool anyRejectFired = false
+anySweepFired := false
+anyRejectFired := false
+
+for kl in gLevels
+    if kl.enabled and not na(kl.val)
+        showThisLevelVisual = kl.sub == "O" ? showOpens : kl.sub == "M" ? showMids : showHiLo
+        // draw level line + label ONLY on value change (event-driven, never every bar/tick)
+        // - purely visual, never gates sweep/reject detection below
+        valueChanged = na(kl.prevVal) or kl.val != kl.prevVal
+        if valueChanged
+            if showLevelLines and showThisLevelVisual
+                if not na(kl.ln)
+                    line.delete(kl.ln)
+                kl.ln := line.new(bar_index, kl.val, bar_index, kl.val, xloc=xloc.bar_index, extend=extend.right, color=color.new(kl.col, 25), style=f_lineStyle(kl.sub), width=lineWidth)
+            if showLevelLabels and showThisLevelVisual
+                if not na(kl.lb)
+                    label.delete(kl.lb)
+                kl.lb := label.new(bar_index, kl.val, kl.dispName, xloc=xloc.bar_index, yloc=yloc.price, style=label.style_label_left, color=color.new(kl.col, 85), textcolor=kl.col, size=lblSz)
+            kl.prevVal := kl.val
+
+        // sweep + rejection detection (independent, same-bar events)
+        if kl.sweepTarget
+            wasAboveState = kl.sweptUpState
+            wasBelowState = kl.sweptDnState
+
+            sweepUpNow = high > kl.val and (minSweepTicks <= 0 or (high - kl.val) >= minSweepTicks)
+            sweepDnNow = low  < kl.val and (minSweepTicks <= 0 or (kl.val - low)  >= minSweepTicks)
+            sweepFireUp = sweepUpNow and not wasAboveState
+            sweepFireDn = sweepDnNow and not wasBelowState
+            kl.sweptUpState := sweepUpNow
+            kl.sweptDnState := sweepDnNow
+
+            rejUpNow = high >= kl.val and close < kl.val
+            rejDnNow = low  <= kl.val and close > kl.val
+            rejFireUp = rejUpNow and not kl.rejUpActive
+            rejFireDn = rejDnNow and not kl.rejDnActive
+            kl.rejUpActive := rejUpNow
+            kl.rejDnActive := rejDnNow
+
+            // one box per firing event, sized to exactly the candle(s) and price
+            // zone involved in that single moment - no accumulation over time.
+            hasUp = sweepFireUp or rejFireUp
+            hasDn = sweepFireDn or rejFireDn
+            anyFire = hasUp or hasDn
+            isReject = rejFireUp or rejFireDn
+
+            if anyFire
+                candTop = hasUp ? high : kl.val
+                candBottom = hasDn ? low : kl.val
+                showThisMarker = isReject ? showRejectMarkers : showSweepMarkers
+
+                if showThisMarker
+                    bColor = isReject ? color.orange : color.blue
+                    bx = box.new(left=bar_index, top=candTop, right=bar_index + 1, bottom=candBottom, xloc=xloc.bar_index, border_color=color.new(bColor, isReject ? 0 : 20), border_width=1, bgcolor=color.new(bColor, isReject ? 85 : 88), extend=extend.none)
+                    array.push(sigBoxes, bx)
+                    if array.size(sigBoxes) > maxSignalHistory
+                        box.delete(array.shift(sigBoxes))
+
+                if showDashboard
+                    array.push(dashEvents, (isReject ? "REJECT  " : "SWEEP   ") + kl.dispName)
+                    array.push(dashColors, isReject ? color.orange : color.blue)
+                    if array.size(dashEvents) > dashRows
+                        array.shift(dashEvents)
+                        array.shift(dashColors)
+
+                if enableAlerts
+                    if isReject and alertOnReject
+                        anyRejectFired := true
+                        alert("REJECTION: " + kl.dispName, alert.freq_once_per_bar)
+                    if not isReject and alertOnSweep
+                        anySweepFired := true
+                        alert("SWEEP: " + kl.dispName, alert.freq_once_per_bar)
+
+// ═══════════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════════════════════════════
+dashPos = dashPosStr == "Top Right" ? position.top_right : dashPosStr == "Top Left" ? position.top_left : dashPosStr == "Bottom Right" ? position.bottom_right : position.bottom_left
+var table dashTbl = table.new(dashPos, 1, dashRows + 1, border_width=1)
+if showDashboard and barstate.islast
+    table.cell(dashTbl, 0, 0, "Key Level Hits", bgcolor=color.new(color.gray, 60), text_color=color.white, text_size=size.small)
+    n = array.size(dashEvents)
+    for i = 0 to dashRows - 1
+        rowIdx = n - 1 - i
+        txt = rowIdx >= 0 ? array.get(dashEvents, rowIdx) : "—"
+        clr = rowIdx >= 0 ? array.get(dashColors, rowIdx) : color.gray
+        table.cell(dashTbl, 0, i + 1, txt, bgcolor=color.new(color.black, 15), text_color=clr, text_size=size.small)
+
+// ═══════════════════════════════════════════════════════════════════
+//  ALERTS (classic alertcondition dialog support)
+// ═══════════════════════════════════════════════════════════════════
+alertcondition(anySweepFired, title="Key Level Sweep", message="Price swept a key level.")
+alertcondition(anyRejectFired, title="Key Level Rejection", message="Price rejected off a key level.")

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCV Food Bank + Mobile Pantry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="site">
+    <h2 class="sr-only">TCV Food Bank website redesign mockup</h2>
+
+    <!-- NAV -->
+    <nav class="nav">
+      <a href="#home" class="nav-logo" aria-label="TCV Food Bank home">
+        <img src="Photos%20for%20Website%20Refresh/logo.png" alt="TCV Food Bank + Mobile Pantry" class="nav-logo-img">
+      </a>
+
+      <button class="nav-hamburger" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+        <i class="ti ti-menu-2" aria-hidden="true"></i>
+      </button>
+
+      <div class="nav-links" id="navMenu" role="navigation">
+        <button class="nav-close" id="navClose" aria-label="Close menu">
+          <i class="ti ti-x" aria-hidden="true"></i>
+        </button>
+        <a href="#home" class="active">Home</a>
+        <a href="#get-food">Get food</a>
+        <a href="#mobile-pantry">Mobile pantry</a>
+        <a href="#volunteer">Volunteer</a>
+        <a href="#about">About</a>
+        <a href="https://tri-city-volunteers-inc.networkforgood.com/projects/84219-homepage-campaign" target="_blank" rel="noopener" class="nav-cta">Donate <i class="ti ti-heart" aria-hidden="true"></i></a>
+      </div>
+      <div class="nav-overlay" id="navOverlay"></div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <div class="hero-tag"><i class="ti ti-map-pin" aria-hidden="true"></i> Fremont, CA · Alameda County</div>
+        <h1>Food for every neighbor,<br><span>no questions asked.</span></h1>
+        <p class="hero-sub">TCV Food Bank + Mobile Pantry serves thousands of families across Alameda County free groceries, no ID required, no income limit.</p>
+        <div class="hero-btns">
+          <a href="#get-food" class="btn-primary"><i class="ti ti-basket" aria-hidden="true"></i> Find food near me</a>
+          <a href="#get-food" class="btn-secondary"><i class="ti ti-calendar" aria-hidden="true"></i> View pantry hours</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-title"><i class="ti ti-clock" aria-hidden="true"></i> This week's hours</div>
+        <div class="hours-row">
+          <span class="hours-day">Monday</span>
+          <span class="hours-time">9:00 am – 1:00 pm</span>
+          <span class="hours-badge">Open</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">Tuesday</span>
+          <span class="hours-time">9:00 am – 1:00 pm</span>
+          <span class="hours-badge">Open</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">Wednesday</span>
+          <span class="hours-time">Closed</span>
+          <span class="hours-badge closed">Closed</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">Thursday</span>
+          <span class="hours-time">9:00 am – 1:00 pm</span>
+          <span class="hours-badge">Open</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">Friday</span>
+          <span class="hours-time">9:00 am – 1:00 pm</span>
+          <span class="hours-badge">Open</span>
+        </div>
+        <div class="hours-row">
+          <span class="hours-day">Saturday</span>
+          <span class="hours-time">10:00 am – 12:00 pm</span>
+          <span class="hours-badge">Open</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- GET FOOD -->
+    <section class="get-food-section" id="get-food">
+      <div class="section-label">Need food?</div>
+      <h2>Two ways to get free groceries</h2>
+      <p class="section-sub">Households in need can visit our Joseph Street location or attend one of our Mobile Pantry sites. Each household may use each option twice a month. No ID required, no income limit.</p>
+
+      <div class="get-food-grid">
+
+        <!-- Marketplace card -->
+        <div class="food-option-card">
+          <div class="food-option-header">
+            <div class="quick-icon icon-green"><i class="ti ti-building-store" aria-hidden="true"></i></div>
+            <div>
+              <h3>TCV Marketplace</h3>
+              <div class="food-option-addr"><a href="https://maps.google.com/?q=37350+Joseph+Street,+Fremont,+CA+94536" target="_blank" rel="noopener">37350 Joseph Street, Fremont, CA 94536</a></div>
+            </div>
+          </div>
+          <p class="food-option-desc">Shop Farmers Market style. Choose from seasonal fruits and vegetables, whole grains, canned and boxed goods, meats, and dairy items. Item availability varies by donation and season.</p>
+          <div class="hours-block">
+            <div class="hours-row">
+              <span class="hours-day">Walk-up</span>
+              <span class="hours-time">Mon – Thu · 10:00 am – 2:00 pm</span>
+              <span class="hours-badge">Open</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day">Drive-thru</span>
+              <span class="hours-time">Friday · 10:00 am – 11:30 am</span>
+              <span class="hours-badge">Open</span>
+            </div>
+            <div class="hours-row">
+              <span class="hours-day">Weekends</span>
+              <span class="hours-time">Closed · also closed all major holidays</span>
+              <span class="hours-badge closed">Closed</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Pantry card -->
+        <div class="food-option-card">
+          <div class="food-option-header">
+            <div class="quick-icon icon-teal"><i class="ti ti-truck" aria-hidden="true"></i></div>
+            <div>
+              <h3>Mobile Pantry sites</h3>
+              <div class="food-option-addr">Multiple locations across Alameda County</div>
+            </div>
+          </div>
+          <div class="marketplace-photo">
+            <img src="Photos%20for%20Website%20Refresh/funny%20carrots.jpg" alt="A community member joyfully holding unique carrots at a mobile pantry site">
+          </div>
+          <p class="food-option-desc">Can't make it to Joseph Street? We bring groceries to you. Visit any of our public Mobile Pantry sites up to twice a month.</p>
+          <a href="#mobile-pantry" class="btn-secondary" style="margin-top:auto;">View all locations <i class="ti ti-arrow-down" aria-hidden="true"></i></a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- IMPACT STATS -->
+    <section class="impact" aria-label="Our impact">
+      <div class="impact-stat">
+        <div class="impact-num">12,000+</div>
+        <div class="impact-label">families served monthly</div>
+      </div>
+      <div class="impact-divider" aria-hidden="true"></div>
+      <div class="impact-stat">
+        <div class="impact-num">2M lbs</div>
+        <div class="impact-label">food distributed yearly</div>
+      </div>
+      <div class="impact-divider" aria-hidden="true"></div>
+      <div class="impact-stat">
+        <div class="impact-num">100%</div>
+        <div class="impact-label">free, always</div>
+      </div>
+    </section>
+
+    <!-- PHOTO STRIP -->
+    <section class="photo-strip" aria-hidden="true">
+      <div class="photo-strip-img">
+        <img src="Photos%20for%20Website%20Refresh/7.7.2025-FremontACCFB-brookeanderson-22.jpg" alt="Volunteers and community members at the TCV Marketplace farmers market table with fresh produce">
+      </div>
+      <div class="photo-strip-img">
+        <img src="Photos%20for%20Website%20Refresh/7.7.2025-FremontACCFB-brookeanderson-21.jpg" alt="Volunteer arranging fresh vegetables and fruit at an outdoor distribution table">
+      </div>
+      <div class="photo-strip-img">
+        <img src="Photos%20for%20Website%20Refresh/7.7.2025-FremontACCFB-brookeanderson-2.jpg" alt="Smiling volunteer holding a bag of potatoes at the food bank warehouse">
+      </div>
+    </section>
+
+    <!-- MOBILE PANTRY -->
+    <section class="pantry" id="mobile-pantry">
+      <div class="section-label">Mobile pantry</div>
+      <h2>We come to your neighborhood</h2>
+      <p class="pantry-sub">Our mobile pantry visits multiple sites across Alameda County. Each household may visit any site up to twice a month.</p>
+      <div class="location-list">
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">Age Well Center at Lake Elizabeth <span class="loc-tag">55+</span></div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=40086+Paseo+Padre+Pkwy,+Fremont,+CA" target="_blank" rel="noopener">40086 Paseo Padre Pkwy, Fremont</a></div>
+            <div class="loc-time">2nd &amp; 4th Thursday of the month · 10:15 am</div>
+          </div>
+        </div>
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">Age Well Center at South Fremont <span class="loc-tag">55+</span></div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=47111+Mission+Falls+Court,+Fremont,+CA" target="_blank" rel="noopener">47111 Mission Falls Court, Fremont</a></div>
+            <div class="loc-time">1st &amp; 3rd Thursday of the month · 10:15 am</div>
+          </div>
+        </div>
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">Schilling Elementary School</div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=36901+Spruce+St,+Newark,+CA" target="_blank" rel="noopener">36901 Spruce St, Newark</a></div>
+            <div class="loc-time">1st &amp; 3rd Wednesday of the month · 11:00 am</div>
+          </div>
+        </div>
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">FACE — Fremont Adult &amp; Continuing Education Center</div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=4700+Calaveras+Ave,+Fremont,+CA" target="_blank" rel="noopener">4700 Calaveras Ave, Fremont</a></div>
+            <div class="loc-time">1st &amp; 3rd Tuesday of the month · 11:30 am</div>
+          </div>
+        </div>
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">Fremont FRC — Family Resource Center</div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=39155+Liberty+St,+Fremont,+CA" target="_blank" rel="noopener">39155 Liberty St, Fremont</a></div>
+            <div class="loc-time">1st &amp; 3rd Wednesday of the month · 10:30 am</div>
+          </div>
+        </div>
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">Ruggieri Senior Center</div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=33997+Alvarado-Niles+Rd,+Union+City,+CA" target="_blank" rel="noopener">33997 Alvarado-Niles Rd, Union City</a></div>
+            <div class="loc-time">2nd &amp; 4th Wednesday of the month · 1:30 pm</div>
+          </div>
+        </div>
+
+        <div class="location-item">
+          <div class="loc-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div>
+          <div class="loc-body">
+            <div class="loc-name">Silliman Activity Center</div>
+            <div class="loc-addr"><a href="https://maps.google.com/?q=6800+Mowry+Avenue,+Newark,+CA" target="_blank" rel="noopener">6800 Mowry Avenue, Newark</a></div>
+            <div class="loc-time">2nd &amp; 4th Friday of the month · 10:30 am</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VOLUNTEER -->
+    <section class="volunteer-section" id="volunteer">
+      <div class="section-label">Volunteer</div>
+      <h2>Make a difference in your community</h2>
+      <p class="section-sub">Volunteers are the backbone of TCV Food Bank. Whether you can spare a few hours or a few days a week, there's a role for you. Sorting food, assisting clients, driving deliveries, and more.</p>
+      <div class="volunteer-feature-img">
+        <img src="Photos%20for%20Website%20Refresh/7.7.2025-FremontACCFB-brookeanderson-16.jpg" alt="Volunteers gathering outdoors before a mobile pantry distribution">
+      </div>
+      <div class="volunteer-grid">
+        <div class="volunteer-card">
+          <div class="quick-icon icon-green"><i class="ti ti-clock" aria-hidden="true"></i></div>
+          <h3>Food sorting</h3>
+          <p>Help sort and pack food donations at our Fremont warehouse. No experience needed.</p>
+        </div>
+        <div class="volunteer-card">
+          <div class="quick-icon icon-teal"><i class="ti ti-truck" aria-hidden="true"></i></div>
+          <h3>Mobile pantry driver</h3>
+          <p>Drive our pantry truck to neighborhoods across Alameda County each week.</p>
+        </div>
+        <div class="volunteer-card">
+          <div class="quick-icon icon-amber"><i class="ti ti-users" aria-hidden="true"></i></div>
+          <h3>Client services</h3>
+          <p>Greet and assist families as they visit our food bank in Fremont.</p>
+        </div>
+      </div>
+      <a href="https://tcvfoodbank.org/volunteer" target="_blank" rel="noopener" class="btn-primary" style="margin-top:1.5rem; display:inline-flex;">Sign up to volunteer</a>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about-section" id="about">
+      <div class="about-inner">
+        <div>
+          <div class="section-label">About us</div>
+          <h2>Serving Alameda County since 1970</h2>
+          <p>TCV Food Bank + Mobile Pantry is the largest client-direct hunger relief organization in Alameda County. We believe access to nutritious food is a right, not a privilege. We've spent over 50 years making that a reality for our neighbors.</p>
+          <p>We serve all community members regardless of immigration status, income level, or documentation. No referral needed, no questions asked.</p>
+          <div class="about-stats">
+            <div class="about-stat"><span>50+</span><p>years serving the community</p></div>
+            <div class="about-stat"><span>#1</span><p>largest client-direct food bank in Alameda County</p></div>
+            <div class="about-stat"><span>0</span><p>barriers to access — ever</p></div>
+          </div>
+          <div class="about-callout">
+            <i class="ti ti-info-circle" aria-hidden="true"></i>
+            <p>No ID, no referral, no income verification required. All community members are welcome, regardless of immigration status or documentation.</p>
+          </div>
+        </div>
+        <div class="about-photo-single">
+          <img src="Photos%20for%20Website%20Refresh/7.7.2025-FremontACCFB-brookeanderson-42.jpg" alt="Two happy community members giving thumbs up after receiving food from TCV Food Bank">
+        </div>
+      </div>
+    </section>
+
+    <!-- DONATE BANNER -->
+    <section class="donate" id="donate">
+      <div class="donate-text">
+        <h2>Help feed a family this week</h2>
+        <p>Every $25 provides a week of groceries for a family of four.</p>
+      </div>
+      <a href="https://tri-city-volunteers-inc.networkforgood.com/projects/84219-homepage-campaign" target="_blank" rel="noopener" class="btn-donate"><i class="ti ti-heart" aria-hidden="true"></i> Donate now</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="Photos%20for%20Website%20Refresh/logo.png" alt="TCV Food Bank + Mobile Pantry" class="footer-logo-img">
+          <p>The largest client-direct hunger relief organization in Alameda County since 1970.</p>
+        </div>
+        <div>
+          <h4>Quick links</h4>
+          <ul class="footer-links">
+            <li><a href="#get-food">Get food</a></li>
+            <li><a href="#mobile-pantry">Mobile pantry</a></li>
+            <li><a href="#volunteer">Volunteer</a></li>
+            <li><a href="#donate">Donate</a></li>
+            <li><a href="#about">About us</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p><a href="https://maps.google.com/?q=37350+Joseph+Street,+Fremont,+CA+94536" target="_blank" rel="noopener">37350 Joseph St<br>Fremont, CA 94536</a><br><br><a href="tel:5107934583">510.793.4583</a></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 TCV Food Bank + Mobile Pantry</p>
+        <div class="footer-social">
+          <a href="https://www.facebook.com/TriCityVolunteers/" target="_blank" rel="noopener" class="social-btn" aria-label="Facebook"><i class="ti ti-brand-facebook" aria-hidden="true"></i></a>
+          <a href="https://www.instagram.com/tricityvolunteers/" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram"><i class="ti ti-brand-instagram" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('navToggle');
+    const close  = document.getElementById('navClose');
+    const menu   = document.getElementById('navMenu');
+    const overlay = document.getElementById('navOverlay');
+
+    function openMenu() {
+      menu.classList.add('open');
+      overlay.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMenu() {
+      menu.classList.remove('open');
+      overlay.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    toggle.addEventListener('click', openMenu);
+    close.addEventListener('click', closeMenu);
+    overlay.addEventListener('click', closeMenu);
+
+    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+  </script>
+</body>
+</html>

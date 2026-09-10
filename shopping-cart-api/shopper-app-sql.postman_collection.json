@@ -1,0 +1,347 @@
+{
+  "info": {
+    "_postman_id": "5760ffb0-545d-4adc-a20f-d25ead821665",
+    "name": "shopper-app-sql",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "39988478"
+  },
+  "item": [
+    {
+      "name": "1. Create Shopper Peter",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\":\"Peter\",\r\n    \"user_name\":\"pete11\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/shopper",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "shopper"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "2. Get all shoppers",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/shopper",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "shopper"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3a. Get John Profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/shopper/john123",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "shopper",
+            "john123"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "3b. Get Invalid Shopper Profile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/shopper/helloworld",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "shopper",
+            "helloworld"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4a. Delete Peter Profile",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/shopper/pete11",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "shopper",
+            "pete11"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "4b. Recreate Peter",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"name\":\"Peter\",\r\n    \"user_name\":\"pete11\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/shopper",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "shopper"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5a. Add Apples to Peter Cart",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"shopper\":\"pete11\",\r\n    \"name\": \"apple\",\r\n    \"price\":1.25,\r\n    \"qty\":3\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/addToCart",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "addToCart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "5b. Add XBox to Peter Cart",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"shopper\":\"pete11\",\r\n    \"name\": \"xbox\",\r\n    \"price\":499.99,\r\n    \"qty\":1\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/addToCart",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "addToCart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6a. Remove apple from John cart",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"shopper\":\"john123\",\r\n    \"name\": \"apple\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/removeFromCart",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "removeFromCart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "6b. Remove xbox from John cart Fail",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"shopper\":\"john123\",\r\n    \"name\": \"xbox\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/removeFromCart",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "removeFromCart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7a. Update Banana (5) in John Cart",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"shopper\":\"john123\",\r\n    \"name\": \"banana\",\r\n    \"qty\": 5\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/updateCart",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "updateCart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "7b. Update XBOX (0) in Peter Cart",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"shopper\":\"pete11\",\r\n    \"name\": \"xbox\",\r\n    \"qty\": 0\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/updateCart",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "updateCart"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "8. Checkout John",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "localhost:3000/checkout/john123",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "checkout",
+            "john123"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "9. View all Shoppers Final",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "localhost:3000/summary",
+          "host": [
+            "localhost"
+          ],
+          "port": "3000",
+          "path": [
+            "summary"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
