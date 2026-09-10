@@ -71,9 +71,7 @@ conditions.
 **Stack:** C++20, CMake.
 
 ## Contact
-
 - Email: cajed4@gmail.com
-- GitHub: this profile
 
 ## License
 
